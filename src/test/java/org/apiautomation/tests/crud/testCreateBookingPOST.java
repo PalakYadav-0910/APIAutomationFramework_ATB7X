@@ -1,10 +1,17 @@
 package org.apiautomation.tests.crud;
 
 import io.qameta.allure.*;
+import io.restassured.RestAssured;
+import org.apiautomation.base.BaseTest;
+import org.apiautomation.endpoints.APIConstants;
+import org.apiautomation.pojos.BookingResponse;
+import org.hamcrest.Matchers;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class testCreateBookingPOST {
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class testCreateBookingPOST extends BaseTest {
 
     @Link(name = "Link to TC", url = "https://bugz.atlassian.net/browse/RBT-4")
     @Issue("JIRA_RBT-4")
@@ -14,6 +21,29 @@ public class testCreateBookingPOST {
     @Description("Verify that POST Request is working fine.")
     @Test
     public void testVerifyCreateBookingPOST01(){
+
+        requestSpecification
+                .basePath(APIConstants.CREATE_UPDATE_BOOKING_URL);
+
+        response = RestAssured.given(requestSpecification)
+                        .when().body(payloadManager.createPayloadBookingAsString())
+                        .post();
+
+        validatableResponse = response.then().log().all();
+        validatableResponse.statusCode(200);
+
+        //Default Rest Assured Assertion
+        validatableResponse.body("booking.firstname", Matchers.equalTo("James"));
+
+        //DeSerialization
+        BookingResponse bookingResponse = payloadManager.bookingResponseJava(response.asString());
+        //AssertJ
+        assertThat(bookingResponse.getBooking()).isNotNull();
+        assertThat(bookingResponse.getBooking().getFirstname()).isNotNull().isNotBlank();
+        assertThat(bookingResponse.getBooking().getFirstname()).isEqualTo("James");
+
+        //TestNG Assertions
         Assert.assertEquals(true,true);
+
     }
 }
