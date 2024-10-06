@@ -5,6 +5,7 @@ import io.restassured.RestAssured;
 import org.apiautomation.base.BaseTest;
 import org.apiautomation.endpoints.APIConstants;
 import org.apiautomation.pojos.BookingResponse;
+import org.apiautomation.utils.PropertyReader;
 import org.hamcrest.Matchers;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -30,7 +31,7 @@ public class testCreateBookingPOST extends BaseTest {
                         .post();
 
         validatableResponse = response.then().log().all();
-        validatableResponse.statusCode(200);
+        validatableResponse.statusCode(Integer.parseInt(PropertyReader.readKey("booking.post.statuscode.success")));
 
         //Default Rest Assured Assertion
         validatableResponse.body("booking.firstname", Matchers.equalTo("James"));
@@ -41,6 +42,7 @@ public class testCreateBookingPOST extends BaseTest {
         assertThat(bookingResponse.getBooking()).isNotNull();
         assertThat(bookingResponse.getBooking().getFirstname()).isNotNull().isNotBlank();
         assertThat(bookingResponse.getBooking().getFirstname()).isEqualTo("James");
+        assertThat(bookingResponse.getBooking().getFirstname()).isEqualTo(PropertyReader.readKey("booking.post.firstname"));
 
         //TestNG Assertions
         Assert.assertEquals(true,true);
